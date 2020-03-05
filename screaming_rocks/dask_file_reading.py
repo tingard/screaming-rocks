@@ -4,10 +4,10 @@ import pandas as pd
 try:
     import dask.dataframe as dd
     from dask.delayed import delayed
-except ModuleNotFoundError:
+except ImportError:
     pass
 from . import RATE
-from .__exceptions import EndOfFileError
+from .exceptions import EndOfFileError
 
 
 FILE_SIZE = 4781506560
