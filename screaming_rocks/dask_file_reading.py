@@ -3,13 +3,12 @@ import numpy as np
 import pandas as pd
 import dask.dataframe as dd
 from dask.delayed import delayed
-
-from . import to_voltage, RATE
+from . import RATE
 
 
 def read_batch(sensor_id, start_time, dt, data_folder=''):
     file_template = 'rct-uop-{:06d}.data.{:05d}.srm'
-    start_byte = np.int64(start_time * RATE * (16 // 8) * 4)
+    start_byte = np.int64(start_time * RATE * int(16 / 8) * 4)
     count = int(dt * RATE * 4)
     i = 1
     while True:
@@ -47,8 +46,21 @@ def read_batch_as_pandas(sensor_id, start_time, dt, data_folder=''):
     return pd.DataFrame(d, columns=cols, index=idx)
 
 
-def get_minute(sensor_id, minute, data_folder):
-    p = lambda start_time: read_batch_as_pandas(sensor_id, start_time, 1, data_folder=data_folder)
-    dfs = [delayed(p)(i) for i in range(60)]
+def read_as_dask(sensor_id, start_time, n_seconds, batch_size=0.1,
+                 data_folder=''):
+    n_batches = int(n_seconds / batch_size)
+    if n_batches != n_seconds / batch_size:
+        raise ValueError('n seconds must be a multiple of batch size')
+
+    def _f(st):
+        return read_batch_as_pandas(
+            sensor_id, st, batch_size,
+            data_folder=data_folder
+        )
+
+    dfs = [
+        delayed(_f)(start_time + i * batch_size)
+        for i in range(int(n_seconds / batch_size))
+    ]
     # dfs
     return dd.from_delayed(dfs)
