@@ -1,9 +1,14 @@
 import os
 import numpy as np
 import pandas as pd
-import dask.dataframe as dd
-from dask.delayed import delayed
+try:
+    import dask.dataframe as dd
+    from dask.delayed import delayed
+except ModuleNotFoundError:
+    pass
 from . import RATE
+
+FILE_SIZE = 4781506560
 
 
 def read_batch(sensor_id, start_time, dt, data_folder=''):
@@ -12,15 +17,14 @@ def read_batch(sensor_id, start_time, dt, data_folder=''):
     count = int(dt * RATE * 4)
     i = 1
     while True:
+        if start_byte >= FILE_SIZE:
+            start_byte -= FILE_SIZE
+            i += 1
+            continue
         in_file_loc = os.path.join(
             data_folder,
             file_template.format(sensor_id, i)
         )
-        fsize = os.path.getsize(in_file_loc)
-        if start_byte >= fsize:
-            start_byte -= fsize
-            i += 1
-            continue
         with open(in_file_loc):
             d = np.fromfile(in_file_loc, dtype=np.uint16,
                             count=count, offset=start_byte)
