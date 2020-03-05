@@ -7,14 +7,15 @@ from dask.delayed import delayed
 from . import to_voltage, RATE
 
 
-def lazy_read(sensor_id, minute, data_folder):
+def lazy_read(sensor_id, minute, data_folder, batch_size=1):
+    """batch size is in units of seconds"""
     file_location = f'rct-uop-{sensor_id:06d}.data.{minute:05d}.srm'
     f_in = os.path.join(data_folder, file_location)
-    batch_size = int(RATE * 4)
+    _batch_size = int(RATE * 4 * batch_size)
     cols = pd.MultiIndex.from_product([(sensor_id,), range(4)])
 
-    def load(second):
-        offset = second * batch_size * 16//8
+    def load(batch_number):
+        offset = batch_number * batch_size * 16//8
         with open(f_in, 'rb') as data_file:
             V = to_voltage(
                 np.fromfile(
