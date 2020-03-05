@@ -7,11 +7,15 @@ setup(name='screaming-rocks',
       author_email='NaN',
       license='MIT',
       packages=find_packages(),
+      extras_require={
+          'dask': [
+              'dask'
+          ]
+      },
       install_requires=[
           'numpy',
           'scipy',
           'pandas',
-          'dask',
           'tqdm',
       ],
       zip_safe=False)
