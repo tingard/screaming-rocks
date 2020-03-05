@@ -1,6 +1,6 @@
 from .dask_file_reading import read_batch
 from .partWelch import partWelch
-from .__exceptions import InvalidTimeError, EndOfFileError
+from .exceptions import InvalidTimeError, EndOfFileError
 from multiprocessing import Pool
 from tqdm import tqdm
 import numpy as np
