@@ -7,6 +7,8 @@ try:
 except ModuleNotFoundError:
     pass
 from . import RATE
+from .__exceptions import EndOfFileError
+
 
 FILE_SIZE = 4781506560
 
@@ -29,14 +31,22 @@ def read_batch(sensor_id, start_time, dt, data_folder=''):
             d = np.fromfile(in_file_loc, dtype=np.uint16,
                             count=count, offset=start_byte)
             d.shape = (-1, 4)
-        if d.shape[0] == count:
+        if d.shape[0] == count / 4:
             return d
         time_read = d.shape[0] / RATE
+        next_file_loc = os.path.join(
+            data_folder,
+            file_template.format(sensor_id, i + 1)
+        )
+        if not os.path.isfile(next_file_loc):
+            raise EndOfFileError('Time length goes beyond end of file')
         d_next_file = read_batch(
             sensor_id, start_time + time_read, dt - time_read,
             data_folder=data_folder
         )
         d_combined = np.concatenate((d, d_next_file), axis=0)
+        if d_combined.shape[0] != dt * RATE:
+            raise EndOfFileError('Time length goes beyond end of file')
         return d_combined
 
 
