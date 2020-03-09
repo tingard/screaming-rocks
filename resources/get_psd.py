@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from screaming_rocks import SENSOR_IDS
-from screaming_rocks.dask_file_reading import read_batch
+from screaming_rocks.file_reading import read_batch
 from screaming_rocks.streaming_welch import streaming_welch
 
 DATA_FOLDER = '/home/tlingard/bucket'

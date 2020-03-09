@@ -1,4 +1,4 @@
-from .dask_file_reading import read_batch
+from .file_reading import read_batch
 from .partWelch import partWelch
 from .exceptions import InvalidTimeError, EndOfFileError
 from multiprocessing import Pool

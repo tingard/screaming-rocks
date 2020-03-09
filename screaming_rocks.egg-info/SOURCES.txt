@@ -1,7 +1,7 @@
 README.md
 setup.py
 screaming_rocks/__init__.py
-screaming_rocks/dask_file_reading.py
+screaming_rocks/file_reading.py
 screaming_rocks.egg-info/PKG-INFO
 screaming_rocks.egg-info/SOURCES.txt
 screaming_rocks.egg-info/dependency_links.txt
